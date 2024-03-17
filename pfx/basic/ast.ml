@@ -1,12 +1,12 @@
 type command =
-  | Push            
+  | Push of int       
   | Add                   
   | Sub                   
   | Mul                   
-  | Div                                    
+  | Div  
+  | Rem                                  
   | Swap                  
-  | Pop                  
-  | Invalid               
+  | Pop                                
 
 
 type program = int * command list

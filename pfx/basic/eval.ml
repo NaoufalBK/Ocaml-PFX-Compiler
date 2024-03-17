@@ -12,9 +12,24 @@ let string_of_state (cmds,stack) =
 (* Question 4.2 *)
 let step state =
   match state with
-  | [], _ -> Error("Nothing to step",state)
-  (* Valid configurations *)
-  | DefineMe :: q , stack          -> Ok (q, stack)
+  | [], _ -> Error ("Nothing to step", state)
+  | Push n :: q, stack -> Ok (q, n :: stack)
+  | Add :: q, v2 :: v1 :: stack -> Ok (q, (v1 + v2) :: stack)
+  | Sub :: q, v2 :: v1 :: stack -> Ok (q, (v1 - v2) :: stack)
+  | Mul :: q, v2 :: v1 :: stack -> Ok (q, (v1 * v2) :: stack)
+  | Div :: q, v2 :: v1 :: stack ->
+      if v2 = 0 then
+        Error ("Division by zero", state)
+      else
+        Ok (q, (v1 / v2) :: stack)
+  | Rem :: q, v2 :: v1 :: stack ->
+      if v2 = 0 then
+        Error ("Modulo by zero", state)
+      else
+        Ok (q, (v1 mod v2) :: stack)
+  | Swap :: q, v2 :: v1 :: stack -> Ok (q, v1 :: v2 :: stack)
+  | Pop :: q, _ :: stack -> Ok (q, stack)
+  | _  -> Error ("Invalid operation", stack)
 
 let eval_program (numargs, cmds) args =
   let rec execute = function
