@@ -1,4 +1,4 @@
-open Ast
+
 open Printf
 
 let string_of_stack stack = sprintf "[%s]" (String.concat ";" (List.map string_of_int stack))
@@ -21,15 +21,15 @@ let step state =
       if v2 = 0 then
         Error ("Division by zero", state)
       else
-        Ok (q, (v1 / v2) :: stack)
+        Ok (q, (v2 / v1) :: stack)
   | Rem :: q, v2 :: v1 :: stack ->
       if v2 = 0 then
         Error ("Modulo by zero", state)
       else
-        Ok (q, (v1 mod v2) :: stack)
+        Ok (q, (v2 mod v1) :: stack)
   | Swap :: q, v2 :: v1 :: stack -> Ok (q, v1 :: v2 :: stack)
   | Pop :: q, _ :: stack -> Ok (q, stack)
-  | _  -> Error ("Invalid operation", stack)
+  | _  -> Error ("Invalid operation", state)
 
 let eval_program (numargs, cmds) args =
   let rec execute = function
