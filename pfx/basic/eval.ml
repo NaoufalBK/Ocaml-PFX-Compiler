@@ -1,4 +1,4 @@
-
+open Ast
 open Printf
 
 let string_of_stack stack = sprintf "[%s]" (String.concat ";" (List.map string_of_int stack))

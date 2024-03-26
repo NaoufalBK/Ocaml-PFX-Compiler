@@ -1,17 +1,17 @@
 open Ast
 
 let rec generate_expr = function
-  | Const n -> [Push n]
+  | Const n -> "push n"
   | Binop (op, e1, e2) ->
     let cmds_e1 = generate_expr e1 in
     let cmds_e2 = generate_expr e2 in
     cmds_e1 @ cmds_e2 @
     (match op with
-    | BinOp.Badd -> [Add]
-    | BinOp.Bsub -> [Sub]
-    | BinOp.Bmul -> [Mul]
-    | BinOp.Bdiv -> [Div]
-    | BinOp.Bmod -> [Rem])
+    | BinOp.Badd -> "add"
+    | BinOp.Bsub -> "sub"
+    | BinOp.Bmul -> "mul"
+    | BinOp.Bdiv -> "div"
+    | BinOp.Bmod -> "Rem")
   | Uminus e ->
     let cmds_e = generate_expr e in
     cmds_e @ [Push 0; Swap; Sub]
@@ -22,3 +22,16 @@ let generate = function
   | Binop(_,_,_) as e -> (0, generate_expr e)
   | Uminus _ as e -> (0, generate_expr e)
   | Var _ as e -> failwith "Not yet supported"
+
+(*open Ast  
+let rec generate = function
+| Const _ -> Push _
+| Binop(op,e1,e2) -> e1 @ e2 @
+  (match op with
+  | BinOp.Badd -> [Add]
+  | BinOp.Bsub -> [Sub]
+  | BinOp.Bmul -> [Mul]
+  | BinOp.Bdiv -> [Div]
+  | BinOp.Bmod -> [Rem])
+| Uminus _ -> _ @ [Push 0; Swap; Sub]
+| Var _ -> failwith "Not yet supported"*)

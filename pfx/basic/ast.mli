@@ -1,6 +1,13 @@
 (* The type of the commands for the stack machine *)
-type command =
-  DefineMe (* Question 4.1 *)
+type command = 
+| Push of int       
+| Add                   
+| Sub                   
+| Mul                   
+| Div  
+| Rem                                  
+| Swap                  
+| Pop 
 
 (* The type for programs *)
 type program = int * command list
