@@ -14,16 +14,16 @@ let step state =
   match state with
   | [], _ -> Error ("Nothing to step", state)
   | Push n :: q, stack -> Ok (q, n :: stack)
-  | Add :: q, v2 :: v1 :: stack -> Ok (q, (v1 + v2) :: stack)
-  | Sub :: q, v2 :: v1 :: stack -> Ok (q, (v1 - v2) :: stack)
-  | Mul :: q, v2 :: v1 :: stack -> Ok (q, (v1 * v2) :: stack)
+  | Add :: q, v2 :: v1 :: stack -> Ok (q, (v2 + v1) :: stack)
+  | Sub :: q, v2 :: v1 :: stack -> Ok (q, (v2 - v1) :: stack)
+  | Mul :: q, v2 :: v1 :: stack -> Ok (q, (v2 * v1) :: stack)
   | Div :: q, v2 :: v1 :: stack ->
-      if v2 = 0 then
+      if v1 = 0 then
         Error ("Division by zero", state)
       else
         Ok (q, (v2 / v1) :: stack)
   | Rem :: q, v2 :: v1 :: stack ->
-      if v2 = 0 then
+      if v1 = 0 then
         Error ("Modulo by zero", state)
       else
         Ok (q, (v2 mod v1) :: stack)
