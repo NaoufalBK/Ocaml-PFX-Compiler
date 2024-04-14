@@ -1,33 +1,30 @@
 {
-  open Utils.Location
+  open Parser 
+  open Utils.Location 
 
-  type token =
-    | PUSH of int | POP | ADD | SUB | MUL | DIV | REM | INT of int | EOF
+ 
+  let mk_int nb =
+    try INT (int_of_string nb)
+    with Failure _ -> failwith (Printf.sprintf "Illegal integer '%s': " nb)
 
   let print_token = function
-    | PUSH n -> print_string ("PUSH " ^ string_of_int n)
-    | POP -> print_string "POP"
-    | ADD -> print_string "ADD"
-    | SUB -> print_string "SUB"
-    | MUL -> print_string "MUL"
-    | DIV -> print_string "DIV"
-    | REM -> print_string "REM"
-    | EOF -> print_string "EOF"
-    | INT i -> print_int i
+| SWAP        -> print_string "Swap" 
+| POP   -> print_string "Pop"
+| PUSH i -> print_string ("Push " ^ (string_of_int i)  )
+| ADD   -> print_string "Add"
+| MUL  -> print_string "Mul"
+| SUB-> print_string "Sub"
+| DIV  -> print_string "Div"
+| REM   -> print_string "Rem"
+| EOF->  print_string "\n"
+| _ -> failwith (Printf.sprintf "Not a token ")
 
-  let mk_int loc nb =
-    try INT (int_of_string nb)
-    with Failure _ -> raise (Error (Printf.sprintf "Illegal integer '%s': " nb, loc))
-
-  let mk_push loc nb =
-    try PUSH (int_of_string nb)
-    with Failure _ -> raise (Error (Printf.sprintf "Illegal push operation '%s': " nb, loc))
-}
+ }
 
 let newline = (['\n' '\r'] | "\r\n")
 let blank = [' ' '\014' '\t' '\012']
 let not_newline_char = [^ '\n' '\r']
-let digit = ['0'-'9']
+let integer = ['0'-'9']+
 
 rule token = parse
   (* newlines *)
@@ -38,38 +35,22 @@ rule token = parse
   | eof      { EOF }
   (* comments *)
   | "--" not_newline_char*  { token lexbuf }
+
   (* integers *)
-  | digit+ as nb           { mk_int (symbol_loc (Lexing.lexeme_start_p lexbuf) (Lexing.lexeme_end_p lexbuf)) nb }
+
+  | integer as nb       {  (mk_int nb ) }
+  (***** TO COMPLETE *****)
   (* commands  *)
-  | "push " + (digit+ as nb)  { mk_push (symbol_loc (Lexing.lexeme_start_p lexbuf) (Lexing.lexeme_end_p lexbuf)) nb  }
-  | "pop"     { POP }
-  | "add"     { ADD }
-  | "sub"     { SUB }
-  | "mul"     { MUL }
-  | "div"     { DIV }
-  | "rem"     { REM }
-  (* illegal characters *)
-  | _ as c                  { raise (Error (Printf.sprintf "Illegal character '%c': " c, symbol_loc (Lexing.lexeme_start_p lexbuf) (Lexing.lexeme_end_p lexbuf))) }
+  | "Swap" { SWAP }
+  | "Sub" { SUB }
+  | "Div" { DIV }
+  | "Mul" { MUL }
+  | "Rem" { REM }
 
-  (* {
-  let rec examine_all lexbuf =
-    let result = token lexbuf in
-    print_token result;
-    print_string " ";
-    match result with
-    | EOF -> ()
-    | _   -> examine_all lexbuf
+  (* illegal characters *)  | "Add" { ADD }
 
-  let compile file =
-  print_string ("File "^file^" is being treated!\n");
-  try
-    let input_file = open_in file in
-    let lexbuf = Lexing.from_channel input_file in
-    examine_all lexbuf;
-    print_newline ();
-    close_in (input_file)
-  with Sys_error _ ->
-    print_endline ("Can't find file '" ^ file ^ "'")
+  | _ as c                  { failwith (Printf.sprintf "\nIllegal character '%c' \n error located at '%s'" c ( string_of (curr lexbuf) ) )  }
 
-  let _ = Arg.parse [] compile ""
-} *)
+  
+  | "Pop" { POP }
+  | "Push" blank+ (integer+ as nb )  { PUSH ( int_of_string nb)}

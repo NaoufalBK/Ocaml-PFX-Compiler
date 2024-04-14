@@ -1,54 +1,54 @@
 %{
-  (* OCaml code can be inserted here *)
+  (* Ocaml code here*)
+open Ast
+
 %}
 
 (**************
  * The tokens *
  **************)
 
-(* Define the tokens recognized by the lexer *)
-%token EOF                  (* End of file *)
-%token <int> INT            (* Integer literal *)
-%token PUSH                 (* Push command *)
-%token POP                  (* Pop command *)
-%token ADD                  (* Add command *)
-%token SUB                  (* Subtract command *)
-%token MUL                  (* Multiply command *)
-%token DIV                  (* Divide command *)
-%token REM                  (* Remainder command *)
+(* enter tokens here, they should begin with %token *)
+%token SWAP        
+%token  POP  
+%token <int> PUSH 
+%token  ADD  
+%token  MUL 
+%token  SUB
+%token  DIV 
+%token  REM  
+%token <int> INT 
+%token EOF
 
 (******************************
  * Entry points of the parser *
  ******************************)
 
-(* Specify the entry point of the parser and the type of the resulting AST node *)
+(* enter your %start clause here *)
 %start <Ast.program> program
+%type < Ast.command list > command  
+%type <Ast.command> operator 
 
 %%
 
 (*************
  * The rules *
  *************)
+program: i=INT EOF { i,[] }
+program : 
+| i=INT c=command EOF  {(i,c)}
+command : 
+  | o=operator c=command {o::c} 
+  | o=PUSH c=command {(Push o)::c }
+  | o=operator {[o]} 
+  | o=PUSH  {[Push o]} 
+operator :      
+| POP {Pop} 
+|ADD   {Add}  
+| MUL   {Mul}
+| SUB   {Sub}
+| DIV   {Div} 
+|REM   {Rem}  
+| SWAP {Swap}
 
-(* Define grammar rules *)
-
-(* Represents the overall structure of a Pfx program *)
-program:
-  | INT EOF { $1, [] }     (* A program consists of an integer followed by end-of-file *)
-
-(* Represents a list of commands in the Pfx program *)
-command_list:
-  | /* Empty */             (* An empty command list *)
-  | command command_list   (* A command followed by another command list *)
-
-(* Represents individual commands in the Pfx language *)
-command:
-  | PUSH INT                (* Push command followed by an integer literal *)
-  | POP                     (* Pop command *)
-  | ADD                     (* Add command *)
-  | SUB                     (* Subtract command *)
-  | MUL                     (* Multiply command *)
-  | DIV                     (* Divide command *)
-  | REM                     (* Remainder command *)
-
-%%
+(* list all rules composing your grammar; obviously your entry point has to be present *)
